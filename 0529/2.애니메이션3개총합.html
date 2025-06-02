@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>통합 애니메이션</title>
+    <style>
+        /* 기본 HTML 및 Body 스타일 */
+        html, body {
+            height: 100%; /* 뷰포트 높이 전체 사용 */
+            width: 100%; /* 뷰포트 너비 전체 사용 */
+            margin: 0;
+            position: relative; /* 자식 요소의 absolute 위치 지정을 위한 기준점 */
+            overflow-x: hidden; /* 트럭이 화면 밖으로 나갈 때 가로 스크롤바 방지 */
+            background: #f0f0f0; /* 배경색 통일 */
+        }
+
+        /* --- 1. 캐릭터 애니메이션 스타일 --- */
+        /* 원본 .container를 .character-main-container로 이름 변경 (클래스 충돌 방지) */
+        .character-main-container {
+            position: absolute; /* 절대 위치 지정 */
+            width: 300px;
+            height: 200px;
+            right: 20px; /* 오른쪽 끝에서 20px */
+            bottom: 20px; /* 아래쪽 끝에서 20px */
+        }
+
+        .character {
+            position: absolute; /* 캐릭터는 부모 컨테이너 내에서 절대 위치 */
+            width: 100px;
+            height: 150px;
+            object-fit: contain;
+        }
+
+        .left {
+            left: 0;
+            top: 0;
+            animation: step1 1s forwards,
+                       step2 4s forwards 1s,
+                       step3 1s forwards 5s,
+                       step4 1s forwards 7s,
+                       step5 1s forwards 9s,
+                       step6 1s forwards 11s,
+                       step7 1s forwards 13s;
+        }
+
+        .right {
+            right: 0;
+            top: 0;
+            animation: meet 2s forwards,
+                       stay 3s forwards 2s,
+                       step3-right-to-left 0.1s forwards 5s,
+                       leave 2s forwards 5.1s;
+        }
+
+        .top-right-img {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            right: 130px;
+            opacity: 0;
+            animation: heart-appear 1s forwards 7.2s, heart-disappear 1s forwards 8.8s,
+                       heart-appear 1s forwards 11.2s, heart-disappear 1s forwards 12.8s;
+        }
+
+        @keyframes meet {
+            from { transform: translateX(0); }
+            to { transform: translateX(-130px); }
+        }
+        @keyframes stay {
+            from { transform: translateX(-130px); }
+            to { transform: translateX(-130px); }
+        }
+        @keyframes step3-right-to-left {
+            from { content: url('imgs/right.png'); }
+            to { content: url('imgs/left.png'); }
+        }
+        @keyframes leave {
+            from { transform: translateX(-130px); opacity: 1; }
+            to { transform: translateX(150px); opacity: 0; }
+        }
+        @keyframes step1 { to { content: url('imgs/left.png'); } }
+        @keyframes step2 { to { opacity: 1; content: url('imgs/left.png'); } }
+        @keyframes step3 { to { content: url('imgs/standard.png'); } }
+        @keyframes step4 { to { content: url('imgs/love.png'); } }
+        @keyframes step5 { to { content: url('imgs/standard.png'); } }
+        @keyframes step6 { to { content: url('imgs/love.png'); } }
+        @keyframes step7 { to { content: url('imgs/standard.png'); } }
+        @keyframes heart-appear {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes heart-disappear {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* --- 2. 진동하는 이미지 컨테이너 스타일 --- */
+        /* 원본 .container-wrapper를 .vibrate-main-wrapper로 이름 변경 */
+        .vibrate-main-wrapper {
+            position: absolute; /* 절대 위치 지정 */
+            display: flex;
+            gap: 20px;
+            right: 20px; /* 오른쪽 끝에서 20px */
+            top: 50%; /* 세로 중앙 기준 */
+            transform: translateY(80px); /* 중앙에서 아래로 80px 이동 */
+        }
+
+        /* 원본 .container를 .vibrate-image-container로 이름 변경 */
+        .vibrate-image-container {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: vibrate 0.3s infinite;
+            background-color: transparent;
+        }
+
+        .vibrate-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        @keyframes vibrate {
+            0%   { transform: translateY(0px); }
+            25%  { transform: translateY(-1px); }
+            50%  { transform: translateY(1px); }
+            75%  { transform: translateY(-1px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* --- 3. 트럭 애니메이션 스타일 --- */
+        @keyframes truckMove {
+            0% {
+                left: 60vw; /* 화면 가로의 60% 지점(중앙보다 오른쪽)에서 시작 */
+                opacity: 1;
+            }
+            80% {
+                left: 90vw; /* 오른쪽으로 이동 */
+                opacity: 1;
+            }
+            100% {
+                left: 100vw; /* 화면 밖으로 나가면서 투명해짐 */
+                opacity: 0;
+            }
+        }
+
+        .truck {
+            position: absolute; /* 절대 위치 지정 */
+            top: 100px; /* 화면 맨 위에서 100px 아래로 이동 */
+            width: 150px;
+            animation: truckMove 4s infinite;
+            /* margin-left는 keyframe의 left 속성으로 대체되므로 제거 */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="character-main-container">
+        <img class="character left" src="imgs/left.png" alt="left">
+        <img class="character right" src="imgs/right.png" alt="right">
+        <img class="top-right-img" src="imgs/heart.png" alt="heart">
+    </div>
+
+    <div class="vibrate-main-wrapper">
+        <div class="vibrate-image-container"><img src="imgs/container.png" alt="컨테이너1" /></div>
+        <div class="vibrate-image-container"><img src="imgs/container.png" alt="컨테이너2" /></div>
+        <div class="vibrate-image-container"><img src="imgs/container.png" alt="컨테이너3" /></div>
+        <div class="vibrate-image-container"><img src="imgs/container.png" alt="컨테이너4" /></div>
+        <div class="vibrate-image-container"><img src="imgs/container.png" alt="컨테이너5" /></div>
+    </div>
+
+    <img src="imgs/truck.png" alt="트럭 이미지" class="truck" />
+
+</body>
+</html>

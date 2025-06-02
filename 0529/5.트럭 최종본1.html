@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>통합 애니메이션</title>
+    <style>
+        /* === 기본 스타일 === */
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            position: relative;
+            overflow-x: hidden;
+            background: #f0f0f0;
+        }
+
+        /* === 1. 캐릭터 애니메이션 === */
+        .character-main-container {
+            position: absolute;
+            width: 300px;
+            height: 200px;
+            right: 20px;
+            bottom: 20px;
+        }
+
+        .character {
+            position: absolute;
+            width: 100px;
+            height: 150px;
+            object-fit: contain;
+        }
+
+        .left {
+            left: 0;
+            top: 0;
+            animation: step1 1s forwards,
+                       step2 4s forwards 1s,
+                       step3 1s forwards 5s,
+                       step4 1s forwards 7s,
+                       step5 1s forwards 9s,
+                       step6 1s forwards 11s,
+                       step7 1s forwards 13s;
+        }
+
+        .right {
+            right: 0;
+            top: 0;
+            animation: meet 2s forwards,
+                       stay 3s forwards 2s,
+                       step3-right-to-left 0.1s forwards 5s,
+                       leave 2s forwards 5.1s;
+        }
+
+        .top-right-img {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            right: 130px;
+            opacity: 0;
+            animation: heart-appear 1s forwards 7.2s, heart-disappear 1s forwards 8.8s,
+                       heart-appear 1s forwards 11.2s, heart-disappear 1s forwards 12.8s;
+        }
+
+        @keyframes meet {
+            from { transform: translateX(0); }
+            to { transform: translateX(-130px); }
+        }
+        @keyframes stay {
+            from { transform: translateX(-130px); }
+            to { transform: translateX(-130px); }
+        }
+        @keyframes step3-right-to-left {
+            from { content: url('imgs/right.png'); }
+            to { content: url('imgs/left.png'); }
+        }
+        @keyframes leave {
+            from { transform: translateX(-130px); opacity: 1; }
+            to { transform: translateX(150px); opacity: 0; }
+        }
+
+        @keyframes step1 { to { content: url('imgs/left.png'); } }
+        @keyframes step2 { to { opacity: 1; content: url('imgs/left.png'); } }
+        @keyframes step3 { to { content: url('imgs/standard.png'); } }
+        @keyframes step4 { to { content: url('imgs/love.png'); } }
+        @keyframes step5 { to { content: url('imgs/standard.png'); } }
+        @keyframes step6 { to { content: url('imgs/love.png'); } }
+        @keyframes step7 { to { content: url('imgs/standard.png'); } }
+
+        @keyframes heart-appear {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes heart-disappear {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* === 2. 진동하는 컨테이너 === */
+        .vibrate-main-wrapper {
+            position: absolute;
+            display: flex;
+            gap: 20px;
+            right: 20px;
+            top: 50%;
+            transform: translateY(80px);
+        }
+
+        .vibrate-image-container {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: vibrate 0.3s infinite;
+            background-color: transparent;
+        }
+
+        .vibrate-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        @keyframes vibrate {
+            0%, 100% { transform: translateY(0px); }
+            25%, 75% { transform: translateY(-1px); }
+            50% { transform: translateY(1px); }
+        }
+
+        /* === 3. 트럭 애니메이션 === */
+        .truck {
+            position: absolute;
+            top: 100px;
+            width: 150px;
+            /* 트럭은 시작 위치에서 대기 후, 가구1이 도착하면 움직이기 시작 */
+            left: 70vw; /* 초기 위치 고정 */
+            animation: truckMove 4s forwards 11.1s; /* 가구1 도착 후 시작 (9.1s + 2s = 11.1s) */
+            opacity: 1; /* 초기에는 보이도록 설정 */
+        }
+
+        @keyframes truckMove {
+            0% {
+                left: 70vw; /* 트럭 시작점 (대기 위치) */
+                opacity: 1;
+            }
+            80% { /* 트럭이 화면 밖으로 나가기 전 */
+                left: 90vw;
+                opacity: 1;
+            }
+            100% { /* 화면 밖으로 완전히 나감 */
+                left: 100vw;
+                opacity: 0;
+            }
+        }
+
+        /* === 4. 레일 === */
+        .rail-container {
+            position: absolute;
+            bottom: 45%;
+            transform: translateY(50%);
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-image: url('imgs/rail.png');
+            background-repeat: repeat-x;
+            background-size: auto 100%;
+            animation: scrollRail 10s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes scrollRail {
+            from { background-position-x: 0; }
+            to { background-position-x: -1500px; }
+        }
+
+        /* === 5. 레일 위 가구 이동 === */
+        .furniture {
+            position: absolute;
+            height: 80px;
+            object-fit: contain;
+            opacity: 0;
+            z-index: 2;
+        }
+
+        .furniture.item1 {
+            bottom: 40%;
+            animation: appearOnRail 0.1s forwards 1s,
+                       moveOnRail 8s linear 1.1s forwards,
+                       moveToTruck 2s linear 9.1s forwards, /* 트럭에 실리는 애니메이션 */
+                       /* 트럭에 실린 후 트럭과 함께 이동 */
+                       truckMove 4s forwards 11.1s; /* 트럭 애니메이션과 동일한 시간과 지연 */
+        }
+        .furniture.item2 {
+            bottom: 48%;
+            animation: appearOnRail 0.1s forwards 4s,
+                       moveOnRail 8s linear 4.1s forwards,
+                       moveToContainer 2s linear 12.1s forwards;
+            animation-fill-mode: forwards;
+            animation-iteration-count: 1;
+        }
+        .furniture.item3 {
+            bottom: 44%;
+            animation: appearOnRail 0.1s forwards 7s,
+                       moveOnRail 8s linear 7.1s forwards,
+                       moveToCharacter 2s linear 15.1s forwards;
+        }
+
+        @keyframes appearOnRail {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes moveOnRail {
+            0% { left: -100px; opacity: 1; }
+            100% {
+                left: calc(70vw - 150px);
+                opacity: 1;
+            }
+        }
+
+        @keyframes moveToTruck {
+            0% {
+                left: calc(70vw - 150px); bottom: 40%; opacity: 1;
+            }
+            30% { /* 오른쪽으로 트럭 쪽으로 이동 */
+                left: 70vw; bottom: 40%; opacity: 1;
+            }
+            60% { /* 트럭 위로 이동 */
+                left: 70vw; bottom: calc(100% - 100px - 80px); opacity: 1;
+            }
+            100% { /* 트럭 위에 최종 위치 */
+                left: calc(70vw + 20px); /* 트럭 안쪽으로 살짝 조정 */
+                bottom: calc(100% - 100px - 80px);
+                opacity: 1;
+            }
+        }
+
+        @keyframes moveToContainer {
+            0% {
+                left: calc(70vw - 150px);
+                bottom: 48%;
+                opacity: 1;
+            }
+            50% {
+                left: calc(100% - 20px - (40px * 5) - (20px * 4) - 20px);
+                top: calc(50% + 80px + 20px);
+                opacity: 1;
+            }
+            100% {
+                left: calc(100% - 20px - (40px * 5) - (20px * 4) - 20px); /* 컨테이너 그룹의 시작점 */
+                top: calc(50% + 80px + 20px); /* vibrate-main-wrapper의 top + 20px (컨테이너 아래) */
+                opacity: 1;
+            }
+        }
+
+        @keyframes moveToCharacter {
+            0% {
+                left: calc(70vw - 150px);
+                bottom: 44%;
+                opacity: 1;
+            }
+            50% {
+                left: calc(100% - 300px - 20px - 50px);
+                bottom: calc(20px + 200px + 50px);
+            }
+            100% {
+                left: calc(100vw - 300px - 20px + 100px + 10px);
+                bottom: calc(20px + 150px - 80px + 10px);
+                opacity: 1;
+            }
+        }
+
+        /* === 6. 도착 아이템은 숨김 === */
+        .arrived-item {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="character-main-container">
+        <img class="character left" src="imgs/left.png" alt="left">
+        <img class="character right" src="imgs/right.png" alt="right">
+        <img class="top-right-img" src="imgs/heart.png" alt="heart">
+    </div>
+
+    <div class="vibrate-main-wrapper">
+        <div class="vibrate-image-container"><img src="imgs/container.png" alt="컨테이너1" /></div>
+        <div class="vibrate-image-container"><img src="imgs/container.png" alt="컨테이너2" /></div>
+        <div class="vibrate-image-container"><img src="imgs/container.png" alt="컨테이너3" /></div>
+        <div class="vibrate-image-container"><img src="imgs/container.png" alt="컨테이너4" /></div>
+        <div class="vibrate-image-container"><img src="imgs/container.png" alt="컨테이너5" /></div>
+    </div>
+
+    <img src="imgs/truck.png" alt="트럭 이미지" class="truck" />
+
+    <div class="rail-container"></div>
+
+    <img src="imgs/furniture1.png" alt="가구1" class="furniture item1" />
+    <img src="imgs/furniture2.png" alt="가구2" class="furniture item2" />
+    <img src="imgs/furniture3.png" alt="가구3" class="furniture item3" />
+
+    <img src="imgs/furniture1.png" alt="도착 가구1" class="arrived-item to-truck" />
+    <img src="imgs/furniture2.png" alt="도착 가구2" class="arrived-item to-vibrate-container" />
+    <img src="imgs/furniture3.png" alt="도착 가구3" class="arrived-item to-character" />
+
+</body>
+</html>
