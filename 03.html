@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pick & Go - 가구 판매 서비스</title>
+    <style>
+        /* === 기본 스타일 === */
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            position: relative;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* === 헤더 === */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo::before {
+            content: "🚛";
+            font-size: 32px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: rgba(56, 161, 105, 0.1);
+            border: 2px solid #38a169;
+            border-radius: 25px;
+            text-decoration: none;
+            color: #38a169;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #38a169;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* === 메인 컨테이너 === */
+        .main-container {
+            padding-top: 120px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 50%, #2f855a 100%);
+        }
+
+        /* === 판매 타이틀 === */
+        .sell-title {
+            text-align: center;
+            color: white;
+            margin: 0 0 60px 0;
+            padding: 0 20px;
+        }
+
+        .sell-title h1 {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 0 0 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .sell-title p {
+            font-size: 22px;
+            margin: 0;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* === 판매 혜택 섹션 === */
+        .benefits-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 0 40px 80px 40px;
+        }
+
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .benefit-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 25px auto;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+
+        .benefit-card h3 {
+            font-size: 24px;
+            color: #2d3748;
+            margin: 0 0 15px 0;
+            font-weight: bold;
+        }
+
+        .benefit-card p {
+            font-size: 16px;
+            color: #718096;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* === 판매 가격 예시 === */
+        .price-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 40px;
+            border-radius: 25px;
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        .price-title {
+            font-size: 36px;
+            color: white;
+            margin: 0 0 40px 0;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .price-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .furniture-img {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+            border-radius: 15px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .furniture-name {
+            font-size: 20px;
+            color: #2d3748;
+            margin: 0 0 10px 0;
+            font-weight: bold;
+        }
+
+        .price-range {
+            font-size: 24px;
+            color: #38a169;
+            font-weight: bold;
+            margin: 0 0 10px 0;
+        }
+
+        .condition {
+            font-size: 14px;
+            color: #718096;
+            margin: 0;
+        }
+
+        /* === 판매 프로세스 === */
+        .sell-process {
+            background: rgba(255, 255, 255, 0.95);
+            margin: 40px;
+            border-radius: 25px;
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        .process-title {
+            font-size: 32px;
+            color: #2d3748;
+            margin: 0 0 40px 0;
+            font-weight: bold;
+        }
+
+        .process-steps {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .process-step {
+            background: linear-gradient(135deg, #e6fffa, #b2f5ea);
+            border-radius: 20px;
+            padding: 30px 25px;
+            text-align: center;
+            max-width: 200px;
+            flex: 1;
+            min-width: 180px;
+            position: relative;
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+        }
+
+        .step-title {
+            font-size: 18px;
+            color: #2d3748;
+            margin: 0 0 10px 0;
+            font-weight: bold;
+        }
+
+        .step-desc {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* === CTA 섹션 === */
+        .cta-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 40px;
+            border-radius: 25px;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 36px;
+            color: white;
+            margin: 0 0 20px 0;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .cta-subtitle {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0 0 40px 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .sell-btn {
+            display: inline-block;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .sell-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+        }
+
+        /* === 보증 섹션 === */
+        .guarantee-section {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 40px;
+            flex-wrap: wrap;
+        }
+
+        .guarantee-item {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px 25px;
+            text-align: center;
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+        }
+
+        .guarantee-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .guarantee-title {
+            font-size: 20px;
+            color: #2d3748;
+            margin: 0 0 10px 0;
+            font-weight: bold;
+        }
+
+        .guarantee-desc {
+            font-size: 14px;
+            color: #718096;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* === 반응형 === */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .sell-title h1 {
+                font-size: 36px;
+            }
+
+            .benefits-section, .price-section, .sell-process, .cta-section, .guarantee-section {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+
+            .process-steps {
+                gap: 20px;
+            }
+
+            .guarantee-section {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            Pick & Go
+        </div>
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-btn">홈으로</a>
+            <a href="service.html" class="nav-btn">정리서비스</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sell-title">
+            <h1>가구 판매로 수익 창출</h1>
+            <p>사용하지 않는 가구를 쉽고 빠르게 판매하세요</p>
+        </div>
+
+        <div class="benefits-section">
+            <div class="benefit-card">
+                <div class="benefit-icon">💰</div>
+                <h3>높은 판매가</h3>
+                <p>AI 기반 시세 분석으로 최적의 판매가격을 제안해드립니다. 시장 가격 대비 최대 20% 높은 수익을 기대할 수 있습니다.</p>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">⚡</div>
+                <h3>빠른 판매</h3>
+                <p>전국 네트워크를 통해 평균 3일 이내에 구매자를 찾아드립니다. 긴 대기시간 없이 빠르게 현금화하세요.</p>
+            </div>
+            <div class="benefit-card">
+                <div class="benefit-icon">🛡️</div>
+                <h3>안전한 거래</h3>
+                <p>전문 검수 시스템과 보험 보장으로 100% 안전한 거래를 보장합니다. 사기나 분쟁 걱정 없이 판매하세요.</p>
+            </div>
+        </div>
+
+        <div class="price-section">
+            <h2 class="price-title">예상 판매 가격</h2>
+            <div class="price-grid">
+                <div class="price-card">
+                    <div class="furniture-img">🛏️</div>
+                    <div class="furniture-name">침대</div>
+                    <div class="price-range">15만원 - 80만원</div>
+                    <div class="condition">상태에 따라 차이</div>
+                </div>
+                <div class="price-card">
+                    <div class="furniture-img">🪑</div>
+                    <div class="furniture-name">의자</div>
+                    <div class="price-range">3만원 - 25만원</div>
+                    <div class="condition">브랜드별 상이</div>
+                </div>
+                <div class="price-card">
+                    <div class="furniture-img">📺</div>
+                    <div class="furniture-name">TV</div>
+                    <div class="price-range">10만원 - 150만원</div>
+                    <div class="condition">크기 및 연식별</div>
+                </div>
+                <div class="price-card">
+                    <div class="furniture-img">🗄️</div>
+                    <div class="furniture-name">옷장</div>
+                    <div class="price-range">20만원 - 100만원</div>
+                    <div class="condition">소재 및 크기별</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sell-process">
+            <h2 class="process-title">판매 과정</h2>
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <div class="step-title">사진 업로드</div>
+                    <div class="step-desc">가구 사진을 찍어서 앱에 올려주세요</div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <div class="step-title">AI 가격 산정</div>
+                    <div class="step-desc">AI가 자동으로 최적의 판매가를 계산합니다</div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <div class="step-title">구매자 매칭</div>
+                    <div class="step-desc">전국 구매 희망자와 자동 매칭됩니다</div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">4</div>
+                    <div class="step-title">거래 완료</div>
+                    <div class="step-desc">안전한 배송 후 즉시 입금됩니다</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="guarantee-section">
+            <div class="guarantee-item">
+                <span class="guarantee-icon">🔒</span>
+                <div class="guarantee-title">100% 보험 보장</div>
+                <div class="guarantee-desc">거래 과정에서 발생하는 모든 문제를 보험으로 보장합니다</div>
+            </div>
+            <div class="guarantee-item">
+                <span class="guarantee-icon">💳</span>
+                <div class="guarantee-title">즉시 입금</div>
+                <div class="guarantee-desc">거래 완료 즉시 계좌로 판매대금이 입금됩니다</div>
+            </div>
+            <div class="guarantee-item">
+                <span class="guarantee-icon">📞</span>
+                <div class="guarantee-title">24시간 고객지원</div>
+                <div class="guarantee-desc">언제든지 궁금한 점을 문의하실 수 있습니다</div>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <h2 class="cta-title">지금 바로 판매 시작하기</h2>
+            <p class="cta-subtitle">사진 한 장으로 시작하는 간편한 가구 판매</p>
+            <a href="#" class="sell-btn">📸 사진 촬영하고 판매하기</a>
+        </div>
+    </div>
+</body>
+</html>
